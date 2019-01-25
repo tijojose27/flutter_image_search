@@ -15,7 +15,20 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class searchCard extends StatelessWidget {
+class searchCard extends StatefulWidget {
+  bool validate;
+  @override
+  State<StatefulWidget> createState() {
+    return _searchCard(validate);
+  }
+}
+
+class _searchCard extends State<searchCard> {
+  _searchCard(this._validate);
+  String value = "";
+  String error = "";
+  final _text = TextEditingController();
+  bool _validate = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,18 +50,32 @@ class searchCard extends StatelessWidget {
               Expanded(
                 child: myTextField(),
               ),
-              Padding(
-                  padding: const EdgeInsets.fromLTRB(5, 0, 15, 0),
-                  child: IconButton(
-                    icon: Icon(Icons.search),
-                    iconSize: 40.0,
-                    onPressed: () {},
-                  ))
+              searchIcon()
             ],
+          ),
+          Text(
+            error,
+            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
           )
         ],
       ),
     );
+  }
+
+  Widget searchIcon() {
+    return Padding(
+        padding: const EdgeInsets.fromLTRB(5, 0, 15, 0),
+        child: IconButton(
+          icon: Icon(Icons.search),
+          iconSize: 40.0,
+          onPressed: () {
+            FocusScope.of(context).requestFocus(new FocusNode());
+            setState(() {
+              _text.text.isEmpty ? _validate=true : _validate=false;
+              print(_validate);
+            });
+          },
+        ));
   }
 
   Widget myTextField() {
@@ -57,8 +84,21 @@ class searchCard extends StatelessWidget {
         child: TextField(
           decoration: InputDecoration(
               labelText: "Enter Search",
+              errorText: _validate ? 'Search is empty' : null,
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25.0))),
-        ));
+        )
+    );
+  }
+
+  bool searchisEmpty(String search) {
+    if (search.length <= 0) {
+      print("ITS EMPTU");
+      error = "Nothing in search Field";
+      return false;
+    }
+    print("ITS NOT EMPTYU");
+    error = "";
+    return true;
   }
 }
