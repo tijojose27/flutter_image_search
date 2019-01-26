@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_image_serach_app/imageResults.dart';
 
 void main() => runApp(MyApp());
 
@@ -16,21 +17,30 @@ class MyApp extends StatelessWidget {
 }
 
 class searchCard extends StatefulWidget {
-  bool validate;
   @override
   State<StatefulWidget> createState() {
-    return _searchCard(validate);
+    return _searchCard();
   }
 }
 
 class _searchCard extends State<searchCard> {
-  _searchCard(this._validate);
+
   String value = "";
   String error = "";
   final _text = TextEditingController();
-  bool _validate = false;
+  bool isEmpty = false;
+
+  @override
+  void dispose() {
+    // Clean up the controller when the Widget is removed from the Widget tree
+    // This also removes the _printLatestValue listener
+    _text.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    print("ISEMPTY AT START = "+isEmpty.toString());
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -71,8 +81,14 @@ class _searchCard extends State<searchCard> {
           onPressed: () {
             FocusScope.of(context).requestFocus(new FocusNode());
             setState(() {
-              _text.text.isEmpty ? _validate=true : _validate=false;
-              print(_validate);
+              if(_text.text.isEmpty){
+                print("ITS EMPTUY");
+                isEmpty=true;
+              }else{
+                print("ITS NOT EMPTU");
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>imageResults(searchTxt: _text.text,)));
+              }
+              print(("Search Button clicked ISEMPTY = "+isEmpty.toString()));
             });
           },
         ));
@@ -82,23 +98,14 @@ class _searchCard extends State<searchCard> {
     return Padding(
         padding: const EdgeInsets.fromLTRB(20, 0, 10, 0),
         child: TextField(
+          controller: _text,
           decoration: InputDecoration(
               labelText: "Enter Search",
-              errorText: _validate ? 'Search is empty' : null,
+              errorText: isEmpty ? 'Search is empty' : null,
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25.0))),
         )
     );
   }
 
-  bool searchisEmpty(String search) {
-    if (search.length <= 0) {
-      print("ITS EMPTU");
-      error = "Nothing in search Field";
-      return false;
-    }
-    print("ITS NOT EMPTYU");
-    error = "";
-    return true;
-  }
 }
