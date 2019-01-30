@@ -1,35 +1,112 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_image_serach_app/ImageData.dart';
+import 'package:http/http.dart' as http;
+import 'dart:async' show Future;
 
-class imageResults extends StatelessWidget{
+String api = "https://pixabay.com/api/?per_page=10&key=";
 
-  imageResults({this.searchTxt});
+String myKey = "5453088-218952e2727878edb32932aef&q=";
 
-  final String searchTxt;
+class ImageResults extends StatefulWidget {
+  ImageResults({this.searchText});
+  String searchText;
+  @override
+  State<StatefulWidget> createState() {
+    return new _ImageResults();
+  }
+}
 
-  final String api = "https://pixabay.com/api/?per_page=10&key=";
+class _ImageResults extends State<ImageResults> {
+  String currApi = "";
 
-  final String myKey = "5453088-218952e2727878edb32932aef";
+  Future<ImageData> fetchData() async {
+    var result = await http.get(currApi);
+    final jsonResponse = json.decode(result.body);
+    ImageData data = ImageData.fromJson(jsonResponse);
+    return data;
+  }
 
+  //INIT STATE
+  @override
+  initState() {
+    super.initState();
+    currApi = api + myKey + widget.searchText;
+  }
 
+  //BUILDER
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Image Search",
-      home: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text("Images"),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: (){
-              Navigator.pop(context);
-            }
-        ),
-      ),
-        body: Center(
-          child: Text(searchTxt),
-        ),
-    ));
+        title: "Image Search",
+        home: Scaffold(
+            appBar: AppBar(
+              centerTitle: true,
+              title: Text("Images"),
+              leading: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  }),
+            ),
+            body: Center(child: myFutureBuilder()
+//                child: ListView.builder(
+//              itemCount: 1,
+//              itemBuilder: (context, position) {
+//                return Padding(
+//                    padding: EdgeInsets.all(50.0),
+//                    child: Card(
+//                        elevation: 15.0,
+//                        child: Column(
+//                          children: <Widget>[
+//                            Image.network(currdata.hits[position].toString()),
+//                            Text(
+//                              "HI THERE ",
+//                              style: TextStyle(
+//                                  fontWeight: FontWeight.bold, fontSize: 20.0),
+//                            )
+//                          ],
+//                        )));
+//              },
+//            )
+                )));
   }
 
+  Widget myFutureBuilder() {
+    return FutureBuilder(
+        future: fetchData(),
+        builder: (context, snapshot) {
+          ImageData currData = snapshot.data;
+          print(snapshot.data.toString());
+          if (snapshot.data != null) {
+//            return Text("${currData.hits[0].webformatURL}");
+            return ListView.builder(
+                itemCount: currData.hits.length,
+                itemBuilder: (context, position) {
+                  return Padding(
+                      padding: EdgeInsets.all(50.0),
+                      child: Card(
+                          elevation: 15.0,
+                          child: Column(
+                            children: <Widget>[
+                              Image.network(currData.hits[position].webformatURL.toString()),
+                              Text(
+                                "HI THERE ",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20.0),
+                              )
+                            ],
+                          )));
+                });
+          } else {
+            print(snapshot.error.toString());
+            return new Container(
+              width: 0,
+              height: 0,
+            );
+          }
+        });
+  }
 }

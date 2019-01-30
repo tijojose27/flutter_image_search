@@ -40,7 +40,7 @@ class _searchCard extends State<searchCard> {
 
   @override
   Widget build(BuildContext context) {
-    print("ISEMPTY AT START = "+isEmpty.toString());
+//    print("ISEMPTY AT START = "+isEmpty.toString());
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -82,13 +82,13 @@ class _searchCard extends State<searchCard> {
             FocusScope.of(context).requestFocus(new FocusNode());
             setState(() {
               if(_text.text.isEmpty){
-                print("ITS EMPTUY");
+//                print("ITS EMPTUY");
                 isEmpty=true;
               }else{
-                print("ITS NOT EMPTU");
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>imageResults(searchTxt: _text.text,)));
+//                print("ITS NOT EMPTU");
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>ImageResults(searchText: _text.text,)));
               }
-              print(("Search Button clicked ISEMPTY = "+isEmpty.toString()));
+//              print(("Search Button clicked ISEMPTY = "+isEmpty.toString()));
             });
           },
         ));
