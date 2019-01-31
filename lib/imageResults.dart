@@ -22,6 +22,7 @@ class _ImageResults extends State<ImageResults> {
   String currApi = "";
 
   Future<ImageData> fetchData() async {
+    print("CALLING FETCH DATA");
     var result = await http.get(currApi);
     final jsonResponse = json.decode(result.body);
     ImageData data = ImageData.fromJson(jsonResponse);
@@ -51,25 +52,6 @@ class _ImageResults extends State<ImageResults> {
                   }),
             ),
             body: Center(child: myFutureBuilder()
-//                child: ListView.builder(
-//              itemCount: 1,
-//              itemBuilder: (context, position) {
-//                return Padding(
-//                    padding: EdgeInsets.all(50.0),
-//                    child: Card(
-//                        elevation: 15.0,
-//                        child: Column(
-//                          children: <Widget>[
-//                            Image.network(currdata.hits[position].toString()),
-//                            Text(
-//                              "HI THERE ",
-//                              style: TextStyle(
-//                                  fontWeight: FontWeight.bold, fontSize: 20.0),
-//                            )
-//                          ],
-//                        )));
-//              },
-//            )
                 )));
   }
 
