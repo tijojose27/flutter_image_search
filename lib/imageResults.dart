@@ -1,9 +1,8 @@
 import 'dart:convert';
-
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_serach_app/ImageData.dart';
 import 'package:http/http.dart' as http;
-import 'dart:async' show Future;
 
 String api = "https://pixabay.com/api/?per_page=10&key=";
 
@@ -21,12 +20,15 @@ class ImageResults extends StatefulWidget {
 class _ImageResults extends State<ImageResults> {
   String currApi = "";
 
-  Future<ImageData> fetchData() async {
-    print("CALLING FETCH DATA");
-    var result = await http.get(currApi);
-    final jsonResponse = json.decode(result.body);
-    ImageData data = ImageData.fromJson(jsonResponse);
-    return data;
+  final AsyncMemoizer _memoizer = AsyncMemoizer();
+  fetchData(){
+    return this._memoizer.runOnce(() async{
+      var result = await http.get(currApi);
+      print("CALLING FETCH DATA");
+      final jsonResponse = json.decode(result.body);
+      ImageData data = ImageData.fromJson(jsonResponse);
+      return data;
+    });
   }
 
   //INIT STATE
@@ -34,6 +36,7 @@ class _ImageResults extends State<ImageResults> {
   initState() {
     super.initState();
     currApi = api + myKey + widget.searchText;
+    print(currApi);
   }
 
   //BUILDER
@@ -62,31 +65,37 @@ class _ImageResults extends State<ImageResults> {
           ImageData currData = snapshot.data;
           print(snapshot.data.toString());
           if (snapshot.data != null) {
-//            return Text("${currData.hits[0].webformatURL}");
-            return ListView.builder(
-                itemCount: currData.hits.length,
-                itemBuilder: (context, position) {
-                  return Padding(
-                      padding: EdgeInsets.all(50.0),
-                      child: Card(
-                          elevation: 15.0,
-                          child: Column(
-                            children: <Widget>[
-                              Image.network(currData.hits[position].webformatURL.toString()),
-                              Text(
-                                "HI THERE ",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20.0),
-                              )
-                            ],
-                          )));
-                });
+            if(currData.totalHits!=0) {
+              return ListView.builder(
+                  itemCount: currData.hits.length,
+                  itemBuilder: (context, position) {
+                    return Padding(
+                        padding: EdgeInsets.all(50.0),
+                        child: Card(
+                            elevation: 15.0,
+                            child: Column(
+                              children: <Widget>[
+                                Image.network(
+                                    currData.hits[position].webformatURL
+                                        .toString()),
+                                Text(
+                                  widget.searchText,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20.0),
+                                )
+                              ],
+                            )));
+                  });
+            }else{
+              return Center(
+                child: Text("NO IMAGES FOUND", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0, color: Colors.red),),
+              );
+            }
           } else {
             print(snapshot.error.toString());
             return new Container(
-              width: 0,
-              height: 0,
+
             );
           }
         });

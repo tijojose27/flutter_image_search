@@ -44,7 +44,7 @@ class _searchCard extends State<searchCard> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("News App"),
+        title: Text("Image Search App"),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
