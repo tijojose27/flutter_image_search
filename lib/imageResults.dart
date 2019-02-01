@@ -11,6 +11,7 @@ String myKey = "5453088-218952e2727878edb32932aef&q=";
 class ImageResults extends StatefulWidget {
   ImageResults({this.searchText});
   String searchText;
+
   @override
   State<StatefulWidget> createState() {
     return new _ImageResults();
@@ -20,9 +21,10 @@ class ImageResults extends StatefulWidget {
 class _ImageResults extends State<ImageResults> {
   String currApi = "";
 
+  //METHOD TO LIMIT API CALLS FOR FUTURE BUILDER
   final AsyncMemoizer _memoizer = AsyncMemoizer();
-  fetchData(){
-    return this._memoizer.runOnce(() async{
+  fetchData() {
+    return this._memoizer.runOnce(() async {
       var result = await http.get(currApi);
       print("CALLING FETCH DATA");
       final jsonResponse = json.decode(result.body);
@@ -30,6 +32,7 @@ class _ImageResults extends State<ImageResults> {
       return data;
     });
   }
+
 
   //INIT STATE
   @override
@@ -54,9 +57,9 @@ class _ImageResults extends State<ImageResults> {
                     Navigator.pop(context);
                   }),
             ),
-            body: Center(child: myFutureBuilder()
-                )));
+            body: Center(child: myFutureBuilder())));
   }
+
 
   Widget myFutureBuilder() {
     return FutureBuilder(
@@ -65,7 +68,7 @@ class _ImageResults extends State<ImageResults> {
           ImageData currData = snapshot.data;
           print(snapshot.data.toString());
           if (snapshot.data != null) {
-            if(currData.totalHits!=0) {
+            if (currData.totalHits != 0) {
               return ListView.builder(
                   itemCount: currData.hits.length,
                   itemBuilder: (context, position) {
@@ -75,9 +78,9 @@ class _ImageResults extends State<ImageResults> {
                             elevation: 15.0,
                             child: Column(
                               children: <Widget>[
-                                Image.network(
-                                    currData.hits[position].webformatURL
-                                        .toString()),
+                                Image.network(currData
+                                    .hits[position].webformatURL
+                                    .toString()),
                                 Text(
                                   widget.searchText,
                                   style: TextStyle(
@@ -87,16 +90,20 @@ class _ImageResults extends State<ImageResults> {
                               ],
                             )));
                   });
-            }else{
+            } else {
               return Center(
-                child: Text("NO IMAGES FOUND", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0, color: Colors.red),),
+                child: Text(
+                  "NO IMAGES FOUND",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                      color: Colors.red),
+                ),
               );
             }
           } else {
             print(snapshot.error.toString());
-            return new Container(
-
-            );
+            return new Container();
           }
         });
   }

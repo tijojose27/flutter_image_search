@@ -1,4 +1,6 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_serach_app/NoConnection.dart';
 import 'package:flutter_image_serach_app/imageResults.dart';
 
 void main() => runApp(MyApp());
@@ -85,8 +87,7 @@ class _searchCard extends State<searchCard> {
 //                print("ITS EMPTUY");
                 isEmpty=true;
               }else{
-//                print("ITS NOT EMPTU");
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>ImageResults(searchText: _text.text,)));
+                checkConnectivity();
               }
 //              print(("Search Button clicked ISEMPTY = "+isEmpty.toString()));
             });
@@ -107,5 +108,18 @@ class _searchCard extends State<searchCard> {
         )
     );
   }
+
+  checkConnectivity() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi) {
+      Navigator.push(context, MaterialPageRoute(
+          builder: (context) => ImageResults(searchText: _text.text,)));
+    } else {
+      Navigator.push(context, MaterialPageRoute(
+          builder: (context) => NoConnection()));
+    }
+  }
+
 
 }
